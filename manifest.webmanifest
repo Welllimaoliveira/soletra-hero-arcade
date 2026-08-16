@@ -1,0 +1,10 @@
+{
+  "name": "Soletra! Hero Arcade",
+  "short_name": "Soletra Hero",
+  "description": "Jogo educativo de soletração, aventura e desafios arcade.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#fff8ec",
+  "theme_color": "#ff6b5b",
+  "lang": "pt-BR"
+}
