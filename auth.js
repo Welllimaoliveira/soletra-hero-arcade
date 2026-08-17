@@ -1,7 +1,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4?bundle';
 
-const SUPABASE_URL = 'https://pjphvwjbmmatkakvmeql.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_VeMeYx1ZSGHOx55tWZntDw_NAsMN_KX';
+const SUPABASE_URL = 'https://jptxomplvexsfyynmxju.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_IiBMmoxgFSC2z_cAifv5Ow_kSXj3wWF';
 
 const APP_URL = 'https://soletra-hero-arcade.vercel.app/';
 
