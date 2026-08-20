@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#FF6B5B">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="stylesheet" href="auth.css">
+<link rel="stylesheet" href="literacy.css">
 <title>Soletra! Hero Arcade v6.3</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@500;600;700&display=swap');
@@ -1048,5 +1049,6 @@ try{document.querySelector('#nexusScreen .hitech-title').textContent='CHUVA NEXU
 window.SoletraDiagnostics={version:'6.3',check(){const ids=['homeScreen','gameScreen','resultScreen','mathHomeScreen','mathPlayScreen','mathResultScreen','gameRoomScreen','heroLabScreen','nexusScreen','blastCanvas','snakeScreen','snakeCanvas','raceScreen','raceCanvas'];const missing=ids.filter(id=>!document.getElementById(id));return{missing,words:WORDS.length,heroes:HEROES.length,gear:HERO_GEAR.length,skins:HERO_SKINS_V6.length,profile:!!state.profile,tickets:blocksData().tickets,snake:profile().miniGames.snake,race:profile().miniGames.race}}};
 
 </script>
+<script src="literacy.js"></script>
 <script type="module" src="auth.js"></script>
 </body></html>
