@@ -7,13 +7,13 @@
     {id:'encontros',name:'4 · Encontros consonantais',sets:[['TRA','TRE','TRI','TRO','TRU'],['PRA','PRE','PRI','PRO','PRU']]}
   ];
   const WORDS = {
-    animais:[['JA','_CARÉ','JACARÉ'],['JA','_GUAR','JAGUAR'],['BO','_RBOLETA','BORBOLETA'],['TRA','_ÇA','TRAÇA']],
-    frutas:[['BA','_NANA','BANANA'],['JA','_CA','JACA'],['LI','_MÃO','LIMÃO'],['MA','_ÇÃ','MAÇÃ']],
-    veiculos:[['JI','_PE','JIPE'],['BI','_CICLETA','BICICLETA'],['TRA','_TOR','TRATOR'],['BO','_TE','BOTE']],
-    escola:[['JA','_NELA','JANELA'],['LI','_VRO','LIVRO'],['BO','_RRACHA','BORRACHA'],['MA','_PA','MAPA']],
-    profissoes:[['JU','_IZ','JUIZ'],['ME','_DICO','MÉDICO'],['PRO','_FESSOR','PROFESSOR'],['BA','_RBEIRO','BARBEIRO']]
+    animais:[['A','_BELHA','ABELHA'],['O','_VELHA','OVELHA'],['JA','_CARÉ','JACARÉ'],['JA','_GUAR','JAGUAR'],['BO','_RBOLETA','BORBOLETA'],['LO','_BO','LOBO'],['MA','_CACO','MACACO'],['NHO','NI_','NINHO'],['TRA','_ÇA','TRAÇA'],['TRU','_TA','TRUTA']],
+    frutas:[['U','_VA','UVA'],['BA','_NANA','BANANA'],['JA','_CA','JACA'],['LI','_MÃO','LIMÃO'],['MA','_ÇÃ','MAÇÃ'],['LA','_RANJA','LARANJA']],
+    veiculos:[['JI','_PE','JIPE'],['BI','_CICLETA','BICICLETA'],['TRA','_TOR','TRATOR'],['BO','_TE','BOTE'],['TRO','ME_Ô','METRÔ']],
+    escola:[['E','_SCOLA','ESCOLA'],['I','_GREJA','IGREJA'],['JA','_NELA','JANELA'],['LI','_VRO','LIVRO'],['BO','_RRACHA','BORRACHA'],['MA','_PA','MAPA'],['CHA','_VE','CHAVE'],['CHI','_NELO','CHINELO'],['PRA','_TO','PRATO'],['PRE','_SENTE','PRESENTE']],
+    profissoes:[['JU','_IZ','JUIZ'],['ME','_DICO','MÉDICO'],['PRO','_FESSOR','PROFESSOR'],['BA','_RBEIRO','BARBEIRO'],['PRI','_NCESA','PRINCESA']]
   };
-  let state={level:1,theme:'animais',set:0,phase:'sound',selected:null,matches:new Set(),word:0,answers:0,errors:0,started:Date.now(),childId:null};
+  let state={level:0,theme:'animais',set:0,phase:'sound',selected:null,matches:new Set(),word:0,answers:0,errors:0,started:Date.now(),childId:null};
 
   function inject(){
     const start=$id('startBtn'); if(!start||$id('literacyLaunch'))return;
@@ -22,11 +22,13 @@
     bind(); renderSetup(); enhanceBlast();
   }
   function bind(){
-    $id('literacyLaunch').onclick=()=>{showScreen('literacyScreen');renderSetup();scrollTo(0,0)};
-    $id('literacyBack').onclick=()=>{showScreen('homeScreen');renderHome()};
+    $id('literacyLaunch').onclick=()=>{openLiteracyScreen();renderSetup();scrollTo(0,0)};
+    $id('literacyBack').onclick=()=>{closeLiteracyScreen()};
     $id('learningStart').onclick=startLearning;
     $id('familyBtn').onclick=openFamily;$id('familyClose').onclick=()=> $id('familyModal').classList.add('hidden');$id('childAdd').onclick=addChild;
   }
+  function openLiteracyScreen(){document.querySelectorAll('.screen').forEach(screen=>screen.classList.toggle('hidden',screen.id!=='literacyScreen'))}
+  function closeLiteracyScreen(){document.querySelectorAll('.screen').forEach(screen=>screen.classList.toggle('hidden',screen.id!=='homeScreen'));if(typeof renderHome==='function')renderHome();scrollTo(0,0)}
   function renderSetup(){
     $id('learningSetup').classList.remove('hidden');$id('learningGame').classList.add('hidden');
     $id('learningLevels').innerHTML=LEVELS.map((l,i)=>`<button class="literacy-option ${state.level===i?'active':''}" data-level="${i}">${l.name}<small style="display:block">${l.sets.flat().join(' · ')}</small></button>`).join('');
@@ -36,12 +38,12 @@
   function currentSyllables(){return LEVELS[state.level].sets[state.set%LEVELS[state.level].sets.length]}
   function startLearning(){Object.assign(state,{phase:'sound',selected:null,matches:new Set(),word:0,answers:0,errors:0,started:Date.now()});$id('learningSetup').classList.add('hidden');$id('learningGame').classList.remove('hidden');$id('soundPhase').classList.remove('hidden');$id('wordPhase').classList.add('hidden');$id('learningTitle').textContent='1. Ouça e associe';$id('learningSubtitle').textContent='Complete todas as combinações para avançar.';renderSounds()}
   function shuffled(a){return [...a].sort(()=>Math.random()-.5)}
-  function speak(s){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(s);u.lang='pt-BR';u.rate=.72;speechSynthesis.speak(u)}
+  function speak(s){try{if(window.AndroidTTS?.speak){window.AndroidTTS.speak(s,'pt-BR');return}}catch(_){}try{if(!('speechSynthesis'in window))throw new Error();window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(s);u.lang='pt-BR';u.rate=.72;window.speechSynthesis.speak(u)}catch(_){feedback(`Som: ${s}`,true)}}
   function renderSounds(){const ss=currentSyllables();$id('soundList').innerHTML=ss.map((s,i)=>`<button class="sound-token ${state.matches.has(s)?'correct':''}" data-sound="${s}">🔊 <span>${i+1}</span></button>`).join('');$id('syllableList').innerHTML=shuffled(ss).map(s=>`<button class="syllable-token ${state.matches.has(s)?'correct':''}" data-syllable="${s}">${s}</button>`).join('');document.querySelectorAll('[data-sound]').forEach(b=>b.onclick=()=>{if(state.matches.has(b.dataset.sound))return;state.selected=b.dataset.sound;document.querySelectorAll('.sound-token').forEach(x=>x.classList.toggle('active',x===b));speak(state.selected)});document.querySelectorAll('[data-syllable]').forEach(b=>b.onclick=()=>matchSyllable(b))}
   function feedback(text,ok){const e=$id('learningFeedback');e.textContent=text;e.className='learning-feedback '+(ok?'ok':'bad')}
   function matchSyllable(btn){if(!state.selected){feedback('Primeiro toque em um áudio 🔊',false);return}state.answers++;if(btn.dataset.syllable===state.selected){state.matches.add(state.selected);feedback('Muito bem! Combinação correta. ✅',true);state.selected=null;renderSounds();if(state.matches.size===currentSyllables().length)setTimeout(startWords,650)}else{state.errors++;btn.classList.add('wrong');feedback('Esse som é diferente. Ouça novamente.',false);speak(state.selected);setTimeout(()=>btn.classList.remove('wrong'),500)}}
-  function availableWords(){const ss=currentSyllables();const themed=WORDS[state.theme].filter(w=>ss.includes(w[0]));return themed.length?themed:WORDS[state.theme]}
-  function startWords(){$id('soundPhase').classList.add('hidden');$id('wordPhase').classList.remove('hidden');$id('wordPhase').innerHTML='<div id="fillWord" class="fill-word"></div><div id="wordChoices" class="syllable-answer-list"></div>';$id('learningTitle').textContent='2. Complete as palavras';$id('learningSubtitle').textContent=`Tema: ${state.theme}. Use as sílabas que você acabou de ouvir.`;state.word=0;renderWord()}
+  function availableWords(){const ss=currentSyllables();return WORDS[state.theme].filter(w=>ss.includes(w[0]))}
+  function startWords(){const words=availableWords();$id('soundPhase').classList.add('hidden');$id('wordPhase').classList.remove('hidden');$id('wordPhase').innerHTML='<div id="fillWord" class="fill-word"></div><div id="wordChoices" class="syllable-answer-list"></div>';$id('learningTitle').textContent='2. Complete as palavras';$id('learningSubtitle').textContent=`Tema: ${state.theme}. Use as sílabas que você acabou de ouvir.`;state.word=0;if(!words.length){feedback('Sons concluídos! Esta família ainda não possui palavra no tema escolhido.',true);setTimeout(finish,700);return}renderWord()}
   function renderWord(){const words=availableWords(),w=words[state.word];if(!w){finish();return}$id('fillWord').textContent=w[1];const choices=shuffled([...new Set([w[0],...currentSyllables()])]).slice(0,5);$id('wordChoices').innerHTML=choices.map(s=>`<button class="syllable-token" data-word-answer="${s}">${s}</button>`).join('');document.querySelectorAll('[data-word-answer]').forEach(b=>b.onclick=()=>answerWord(b,w))}
   function answerWord(btn,w){state.answers++;if(btn.dataset.wordAnswer===w[0]){btn.classList.add('correct');feedback(`${w[2]}! Você acertou. 🌟`,true);speak(w[2]);state.word++;setTimeout(renderWord,850)}else{state.errors++;btn.classList.add('wrong');feedback('Tente outra sílaba.',false);setTimeout(()=>btn.classList.remove('wrong'),500)}}
   async function finish(){const score=Math.max(10,state.answers*10-state.errors*3),accuracy=Math.round((state.answers-state.errors)/Math.max(1,state.answers)*100);feedback(`Trilha concluída: ${score} pontos · ${accuracy}% de precisão! 🏆`,true);$id('wordPhase').innerHTML=`<div class="fill-word">🏆</div><h3 style="text-align:center">Trilha concluída!</h3><p style="text-align:center">${score} pontos · ${accuracy}% de precisão</p><button id="learningAgain" class="primary wide">Próxima trilha</button>`;$id('learningAgain').onclick=()=>{state.set++;renderSetup()};await saveProgress(score,accuracy)}
