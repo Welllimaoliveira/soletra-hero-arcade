@@ -536,8 +536,7 @@ async function enter(user) {
           : 'Usuário';
 
     $('authAdminBtn').hidden =
-      !['admin', 'master']
-        .includes(currentProfile.role);
+      currentProfile.role !== 'master';
 
     shell.hidden = true;
     account.hidden = false;
@@ -589,6 +588,10 @@ function leave() {
 }
 
 async function loadUsers() {
+
+  if (currentProfile?.role !== 'master') {
+    return;
+  }
 
   admin.hidden = false;
 
