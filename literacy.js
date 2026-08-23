@@ -127,7 +127,14 @@
   function enhanceBlast(){
     if(typeof blastMoveDrag!=='function')return;
     const oldEnd=blastEndDrag;
-    blastMoveDrag=function(e){const d=blastGame.drag;if(!d||!blastGame.running||blastGame.paused)return;positionBlastFloatingPiece(e.clientX,e.clientY-58);const board=$id('blastCanvas'),rect=board.getBoundingClientRect(),lift=58,inside=e.clientX>=rect.left&&e.clientX<=rect.right&&e.clientY-lift>=rect.top&&e.clientY-lift<=rect.bottom;if(inside){const scaleX=board.width/rect.width,scaleY=board.height/rect.height,cell=board.width/BLAST_SIZE;const px=(e.clientX-rect.left)*scaleX,py=(e.clientY-lift-rect.top)*scaleY;d.col=Math.round(px/cell-d.piece.shape[0].length/2);d.row=Math.round(py/cell-d.piece.shape.length/2);d.valid=blastCanPlace(d.piece.shape,d.row,d.col)}else d.valid=false;drawBlastBoard();const box=document.querySelector('.blast-board-box');box?.classList.toggle('drop-ok',!!d.valid);box?.classList.toggle('drop-bad',!d.valid);e.preventDefault()};
+    // positionBlastFloatingPiece já aplica -48px sozinha (levanta a peça
+    // acima do dedo). O bug era passar e.clientY-58 pra ela E também usar
+    // lift=58 no cálculo do tabuleiro: a peça flutuante ficava a -106px do
+    // dedo, mas o quadrado de pré-visualização (e o encaixe real) calculava
+    // com -58px - dois deslocamentos diferentes, por isso não coincidiam.
+    // Usando o MESMO valor (48, igual ao interno da função) nos dois lugares,
+    // a peça exibida e o quadrado de destino ficam sempre alinhados.
+    blastMoveDrag=function(e){const d=blastGame.drag;if(!d||!blastGame.running||blastGame.paused)return;const lift=48;positionBlastFloatingPiece(e.clientX,e.clientY);const board=$id('blastCanvas'),rect=board.getBoundingClientRect(),inside=e.clientX>=rect.left&&e.clientX<=rect.right&&e.clientY-lift>=rect.top&&e.clientY-lift<=rect.bottom;if(inside){const scaleX=board.width/rect.width,scaleY=board.height/rect.height,cell=board.width/BLAST_SIZE;const px=(e.clientX-rect.left)*scaleX,py=(e.clientY-lift-rect.top)*scaleY;d.col=Math.round(px/cell-d.piece.shape[0].length/2);d.row=Math.round(py/cell-d.piece.shape.length/2);d.valid=blastCanPlace(d.piece.shape,d.row,d.col)}else d.valid=false;drawBlastBoard();const box=document.querySelector('.blast-board-box');box?.classList.toggle('drop-ok',!!d.valid);box?.classList.toggle('drop-bad',!d.valid);e.preventDefault()};
     blastEndDrag=function(){const valid=!!blastGame.drag?.valid;oldEnd();const box=document.querySelector('.blast-board-box');box?.classList.remove('drop-ok','drop-bad');if(!valid&&blastGame.running){box?.animate([{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(0)'}],{duration:260});sound('bad')}};
   }
   state.childId=localStorage.getItem('soletra-child-id');
