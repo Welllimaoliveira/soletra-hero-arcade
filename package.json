@@ -1,0 +1,9 @@
+{
+  "name": "soletra-hero-arcade",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Site estático (index.html) + funções serverless da Vercel em /api para a assinatura Mercado Pago.",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.57.4"
+  }
+}
