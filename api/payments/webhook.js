@@ -100,6 +100,20 @@ module.exports = async (req, res) => {
           },
           { onConflict: "provider_payment_id" }
         );
+
+        // Estende o acesso a cada cobrança recorrente aprovada, sem depender
+        // só da notificação de "preapproval" (o Mercado Pago garante o
+        // evento de "payment" a cada cobrança, mas nem sempre reemite o de
+        // "preapproval" apenas por avançar a data do próximo pagamento) -
+        // sem isso, quem paga certinho todo mês podia ficar sem acesso
+        // depois do primeiro ciclo.
+        if (data.status === "approved") {
+          await admin
+            .from("subscriptions")
+            .update({ status: "active", current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), updated_at: new Date().toISOString() })
+            .eq("user_id", userId)
+            .eq("provider", "mercado_pago");
+        }
       }
     }
 
