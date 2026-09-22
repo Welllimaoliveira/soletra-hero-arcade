@@ -82,7 +82,7 @@
     $id('learningSetup').classList.remove('hidden');$id('learningGame').classList.add('hidden');
     $id('learningLevels').innerHTML=LEVELS.map((l,i)=>`<button class="literacy-option ${state.level===i?'active':''}" data-level="${i}">${l.name}<small style="display:block">${l.sets.flat().join(' · ')}</small></button>`).join('');
     $id('learningThemes').innerHTML=Object.keys(WORDS).map(t=>`<button class="literacy-option ${state.theme===t?'active':''}" data-theme="${t}">${THEME_LABELS[t]}</button>`).join('');
-    document.querySelectorAll('[data-level]').forEach(b=>b.onclick=()=>{state.level=+b.dataset.level;state.set=0;renderSetup()});document.querySelectorAll('[data-theme]').forEach(b=>b.onclick=()=>{state.theme=b.dataset.theme;renderSetup()});
+    document.querySelectorAll('[data-level]').forEach(b=>b.onclick=()=>{state.level=+b.dataset.level;state.set=0;renderSetup()});document.querySelectorAll('#learningThemes [data-theme]').forEach(b=>b.onclick=()=>{state.theme=b.dataset.theme;renderSetup()});
   }
   function currentSyllables(){return LEVELS[state.level].sets[state.set%LEVELS[state.level].sets.length]}
   function startLearning(){Object.assign(state,{phase:'sound',selected:null,matches:new Set(),word:0,answers:0,errors:0,started:Date.now()});$id('learningSetup').classList.add('hidden');$id('learningGame').classList.remove('hidden');$id('soundPhase').classList.remove('hidden');$id('wordPhase').classList.add('hidden');$id('learningTitle').textContent='1. Ouça e associe';$id('learningSubtitle').textContent='Complete todas as combinações para avançar.';renderSounds()}
