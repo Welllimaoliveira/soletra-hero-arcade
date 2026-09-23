@@ -1274,7 +1274,7 @@ try{document.querySelector('#nexusScreen .hitech-title').textContent='CHUVA NEXU
 window.SoletraDiagnostics={version:'6.3',check(){const ids=['homeScreen','gameScreen','resultScreen','mathHomeScreen','mathPlayScreen','mathResultScreen','gameRoomScreen','heroLabScreen','nexusScreen','blastCanvas','snakeScreen','snakeCanvas','raceScreen','raceCanvas'];const missing=ids.filter(id=>!document.getElementById(id));return{missing,words:WORDS.length,heroes:HEROES.length,gear:HERO_GEAR.length,skins:HERO_SKINS_V6.length,profile:!!state.profile,tickets:blocksData().tickets,snake:profile().miniGames.snake,race:profile().miniGames.race}}};
 
 </script>
-<script src="literacy.js"></script><script src="symbol-riddle.js"></script><script src="forca.js"></script><script src="settings.js"></script>
+<script src="literacy.js"></script><script src="phrase-cloze.js"></script><script src="symbol-riddle.js"></script><script src="forca.js"></script><script src="settings.js"></script>
 <script type="module" src="auth.js"></script>
 <!-- Cobrança via Mercado Pago desativada (app liberado pra todo mundo).
      billing.js e as rotas em api/payments/ continuam no repo, sem uso,
