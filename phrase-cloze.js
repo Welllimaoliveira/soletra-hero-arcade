@@ -10,26 +10,92 @@
   const $id = (id) => document.getElementById(id);
   const esc = (s) => { const d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; };
 
+  // S(pt, en, resposta, ...erradas) - monta a frase; as opções são embaralhadas na hora de jogar.
+  const S = (pt, en, answer, ...wrong) => ({ pt, en, answer, options: [answer, ...wrong] });
+
   const LEVELS = [
-    { id: 0, name: 'Nível 1', desc: 'Frases bem curtas', sentences: [
-      { pt: 'O gato é preto.', en: 'The cat is ___.', answer: 'black', options: ['black', 'white', 'red', 'green'] },
-      { pt: 'Eu tenho um irmão.', en: 'I have a ___.', answer: 'brother', options: ['brother', 'sister', 'friend', 'mother'] },
-      { pt: 'Ela está feliz.', en: 'She is ___.', answer: 'happy', options: ['happy', 'sad', 'angry', 'tired'] },
-      { pt: 'Nós vamos à escola.', en: 'We go to ___.', answer: 'school', options: ['school', 'home', 'park', 'store'] },
-      { pt: 'Ele gosta de futebol.', en: 'He likes ___.', answer: 'soccer', options: ['soccer', 'tennis', 'swimming', 'basketball'] },
-      { pt: 'Eu como uma maçã.', en: 'I eat an ___.', answer: 'apple', options: ['apple', 'banana', 'orange', 'bread'] },
-      { pt: 'O sol é amarelo.', en: 'The sun is ___.', answer: 'yellow', options: ['yellow', 'blue', 'purple', 'pink'] },
-      { pt: 'Minha mãe é professora.', en: 'My mother is a ___.', answer: 'teacher', options: ['teacher', 'doctor', 'nurse', 'cook'] },
+    { id: 0, icon: '🌱', name: 'Fácil', desc: 'Frases bem curtas', sentences: [
+      S('O gato é preto.', 'The cat is ___.', 'black', 'white', 'red', 'green'),
+      S('Eu tenho um irmão.', 'I have a ___.', 'brother', 'sister', 'friend', 'mother'),
+      S('Ela está feliz.', 'She is ___.', 'happy', 'sad', 'angry', 'tired'),
+      S('Nós vamos à escola.', 'We go to ___.', 'school', 'home', 'park', 'store'),
+      S('Ele gosta de futebol.', 'He likes ___.', 'soccer', 'tennis', 'swimming', 'basketball'),
+      S('Eu como uma maçã.', 'I eat an ___.', 'apple', 'banana', 'orange', 'bread'),
+      S('O sol é amarelo.', 'The sun is ___.', 'yellow', 'blue', 'purple', 'pink'),
+      S('Minha mãe é professora.', 'My mother is a ___.', 'teacher', 'doctor', 'nurse', 'cook'),
+      S('O cachorro está dormindo.', 'The dog is ___.', 'sleeping', 'eating', 'running', 'jumping'),
+      S('Eu bebo água.', 'I drink ___.', 'water', 'milk', 'juice', 'tea'),
     ]},
-    { id: 1, name: 'Nível 2', desc: 'Frases um pouco maiores', sentences: [
-      { pt: 'Eu moro perto do parque.', en: 'I live near the ___.', answer: 'park', options: ['park', 'beach', 'mountain', 'river'] },
-      { pt: 'Ela está com sede.', en: 'She is ___.', answer: 'thirsty', options: ['thirsty', 'hungry', 'sleepy', 'scared'] },
-      { pt: 'Nós assistimos um filme ontem.', en: 'We watched a ___ yesterday.', answer: 'movie', options: ['movie', 'book', 'game', 'show'] },
-      { pt: 'O pássaro está voando alto.', en: 'The bird is flying ___.', answer: 'high', options: ['high', 'low', 'fast', 'slow'] },
-      { pt: 'Eu preciso de ajuda com a lição.', en: 'I need help with my ___.', answer: 'homework', options: ['homework', 'toy', 'shoes', 'lunch'] },
-      { pt: 'Ela ganhou a corrida.', en: 'She won the ___.', answer: 'race', options: ['race', 'game', 'prize', 'medal'] },
-      { pt: 'Meu pai dirige um carro azul.', en: 'My father drives a blue ___.', answer: 'car', options: ['car', 'bike', 'boat', 'truck'] },
-      { pt: 'Está chovendo lá fora.', en: 'It is ___ outside.', answer: 'raining', options: ['raining', 'sunny', 'snowing', 'windy'] },
+    { id: 1, icon: '🌿', name: 'Médio', desc: 'Frases um pouco maiores', sentences: [
+      S('Eu moro perto do parque.', 'I live near the ___.', 'park', 'beach', 'mountain', 'river'),
+      S('Ela está com sede.', 'She is ___.', 'thirsty', 'hungry', 'sleepy', 'scared'),
+      S('Nós assistimos um filme ontem.', 'We watched a ___ yesterday.', 'movie', 'book', 'game', 'show'),
+      S('O pássaro está voando alto.', 'The bird is flying ___.', 'high', 'low', 'fast', 'slow'),
+      S('Eu preciso de ajuda com a lição.', 'I need help with my ___.', 'homework', 'toy', 'shoes', 'lunch'),
+      S('Ela ganhou a corrida.', 'She won the ___.', 'race', 'game', 'prize', 'medal'),
+      S('Meu pai dirige um carro azul.', 'My father drives a blue ___.', 'car', 'bike', 'boat', 'truck'),
+      S('Está chovendo lá fora.', 'It is ___ outside.', 'raining', 'sunny', 'snowing', 'windy'),
+      S('Minha irmã tem dez anos.', 'My sister is ten years ___.', 'old', 'young', 'tall', 'big'),
+      S('Nós jogamos bola no parque.', 'We play ___ in the park.', 'ball', 'bread', 'shoes', 'table'),
+      S('Eu vejo uma estrela no céu.', 'I see a star in the ___.', 'sky', 'sea', 'room', 'tree'),
+      S('O livro está em cima da mesa.', 'The book is on the ___.', 'table', 'door', 'moon', 'cloud'),
+      S('Ela escova os dentes de manhã.', 'She brushes her ___ in the morning.', 'teeth', 'eyes', 'ears', 'nose'),
+      S('Eu quero um copo de leite.', 'I want a glass of ___.', 'milk', 'bread', 'rice', 'meat'),
+      S('Hoje é meu aniversário.', 'Today is my ___.', 'birthday', 'shoes', 'window', 'pencil'),
+    ]},
+    { id: 2, icon: '🚀', name: 'Difícil', desc: 'Verbos e comparações', sentences: [
+      S('Eles estão jogando futebol agora.', 'They are ___ soccer now.', 'playing', 'play', 'plays', 'played'),
+      S('Ela foi ao mercado ontem.', 'She ___ to the market yesterday.', 'went', 'go', 'goes', 'going'),
+      S('Eu sou mais alto que meu irmão.', 'I am ___ than my brother.', 'taller', 'tall', 'tallest', 'more tall'),
+      S('Nós sempre comemos juntos.', 'We always ___ together.', 'eat', 'eats', 'eating', 'ate'),
+      S('Ele não gosta de chuva.', 'He ___ like rain.', "doesn't", "don't", "isn't", 'not'),
+      S('Há muitos livros na biblioteca.', 'There ___ many books in the library.', 'are', 'is', 'am', 'be'),
+      S('Ela sempre chega cedo.', 'She always ___ early.', 'arrives', 'arrive', 'arriving', 'arrived'),
+      S('Eu comprei um presente para você.', 'I bought a gift ___ you.', 'for', 'at', 'in', 'on'),
+      S('O filme começa às oito.', 'The movie starts ___ eight.', 'at', 'in', 'on', 'by'),
+      S('Ele é o menino mais rápido da escola.', 'He is the ___ boy in the school.', 'fastest', 'fast', 'faster', 'more fast'),
+      S('Vocês já terminaram a lição?', 'Have you ___ your homework?', 'finished', 'finish', 'finishing', 'finishes'),
+      S('Eu estava dormindo quando você ligou.', 'I was ___ when you called.', 'sleeping', 'sleep', 'slept', 'sleeps'),
+      S('Ela tem dois gatos e eu tenho um cachorro.', 'She has two cats and I have ___ dog.', 'a', 'an', 'two', 'many'),
+      S('Nós vamos viajar amanhã.', 'We are going to ___ tomorrow.', 'travel', 'traveled', 'traveling', 'travels'),
+      S('Ele corre rápido.', 'He runs ___.', 'fast', 'fastly', 'fastest', 'speed'),
+      S('Eu não tenho nenhum dinheiro.', 'I do not have ___ money.', 'any', 'many', 'a', 'few'),
+      S('A casa dela é maior que a minha.', 'Her house is ___ than mine.', 'bigger', 'big', 'biggest', 'more big'),
+      S('Quantas maçãs você quer?', 'How ___ apples do you want?', 'many', 'much', 'more', 'few'),
+      S('Estou com muito sono.', 'I am very ___.', 'sleepy', 'sleep', 'sleeping', 'slept'),
+      S('Ontem choveu o dia todo.', 'It ___ all day yesterday.', 'rained', 'rain', 'rains', 'raining'),
+    ]},
+    { id: 3, icon: '🔥', name: 'Super difícil', desc: 'Expressões e tempos verbais', sentences: [
+      S('Se eu tivesse tempo, eu viajaria mais.', 'If I ___ time, I would travel more.', 'had', 'have', 'has', 'will have'),
+      S('Ela mora aqui desde 2020.', 'She has lived here ___ 2020.', 'since', 'for', 'from', 'during'),
+      S('O bolo foi feito pela minha avó.', 'The cake was ___ by my grandmother.', 'made', 'make', 'making', 'makes'),
+      S('Eu desisti de fumar.', 'I gave ___ smoking.', 'up', 'in', 'out', 'off'),
+      S('Preciso me acostumar com o frio.', 'I need to get used ___ the cold.', 'to', 'with', 'at', 'for'),
+      S('Ele disse que estava cansado.', 'He said that he ___ tired.', 'was', 'is', 'will be', 'has been'),
+      S('Quanto mais você estuda, mais aprende.', 'The more you study, the more you ___.', 'learn', 'learned', 'learning', 'learns'),
+      S('Apesar da chuva, nós saímos.', '___ the rain, we went out.', 'Despite', 'Because', 'Unless', 'While'),
+      S('Eu gostaria de saber onde ele mora.', 'I would like to know where he ___.', 'lives', 'live', 'living', 'is live'),
+      S('Ela é a mulher cujo filho é médico.', 'She is the woman ___ son is a doctor.', 'whose', 'who', 'which', 'whom'),
+      S('Eu mal consigo ouvir você.', 'I can ___ hear you.', 'hardly', 'hard', 'harder', 'hardest'),
+      S('Vou ligar para você assim que chegar.', 'I will call you as soon as I ___.', 'arrive', 'will arrive', 'arrived', 'arriving'),
+      S('Ele deveria ter estudado mais.', 'He should have ___ more.', 'studied', 'study', 'studies', 'studying'),
+      S('Mal posso esperar para te encontrar.', 'I can not wait to ___ you.', 'meet', 'met', 'meeting', 'meets'),
+      S('Ela me perguntou se eu estava com fome.', 'She asked me ___ I was hungry.', 'if', 'that', 'what', 'who'),
+      S('Eu prefiro chá a café.', 'I prefer tea ___ coffee.', 'to', 'than', 'from', 'over'),
+      S('Chegamos tarde por causa do trânsito.', 'We arrived late ___ the traffic.', 'because of', 'because', 'although', 'instead'),
+      S('Quem quebrou a janela?', 'Who ___ the window?', 'broke', 'break', 'broken', 'breaks'),
+      S('É a melhor pizza que já comi.', 'It is the best pizza I have ever ___.', 'eaten', 'eat', 'ate', 'eating'),
+      S('Ele fala como se soubesse tudo.', 'He talks as if he ___ everything.', 'knew', 'knows', 'know', 'known'),
+      S('Eu estou acostumado a acordar cedo.', 'I am used to ___ up early.', 'waking', 'wake', 'woke', 'woken'),
+      S('Nem ela nem eu fomos à festa.', 'Neither she ___ I went to the party.', 'nor', 'or', 'and', 'but'),
+      S('Isso soa interessante.', 'That ___ interesting.', 'sounds', 'hears', 'listens', 'speaks'),
+      S('Cuidado com o degrau!', 'Watch ___ for the step!', 'out', 'on', 'at', 'in'),
+      S('Você se importa se eu abrir a janela?', 'Do you mind if I ___ the window?', 'open', 'opening', 'to open', 'opens'),
+      S('Ele trabalha aqui há cinco anos.', 'He has worked here ___ five years.', 'for', 'since', 'during', 'in'),
+      S('Seria melhor se você ficasse em casa.', 'It would be better if you ___ at home.', 'stayed', 'stay', 'will stay', 'staying'),
+      S('Ela é tão alta quanto o pai.', 'She is as tall ___ her father.', 'as', 'than', 'like', 'so'),
+      S('A professora mandou todos ficarem quietos.', 'The teacher told everyone to keep ___.', 'quiet', 'quietly', 'quietness', 'quietest'),
+      S('Quanto tempo vai demorar?', 'How ___ will it take?', 'long', 'far', 'tall', 'wide'),
     ]},
   ];
 
@@ -79,32 +145,6 @@
     <button id="pcHomeBtn" class="secondary wide">⌂ Voltar ao início</button>
   </div>
 </section>`);
-    const css = document.createElement('style');
-    css.textContent = `
-    .phrasecloze-launch{width:100%;border:0;border-radius:22px;padding:16px;margin-top:10px;background:linear-gradient(135deg,#FF9A6E,#FF6B5B);color:#fff;box-shadow:0 6px 0 #C2483B;cursor:pointer;display:flex;align-items:center;gap:14px;text-align:left}
-    .phrasecloze-launch span:first-child{font-size:44px}.phrasecloze-launch b{font:700 21px 'Fredoka';display:block}.phrasecloze-launch small{font-weight:800}
-    .pc-hero{text-align:center;padding:6px 0 14px}.pc-hero .icon{font-size:60px}.pc-hero h2{font-family:'Fredoka';font-size:27px;margin:2px 0;color:var(--coral)}.pc-hero p{margin:0;color:var(--muted);font-weight:700}
-    .pc-level-grid{display:grid;gap:10px}
-    .pc-level-card{border:3px solid var(--line);background:#fff;border-radius:20px;padding:14px;text-align:left;cursor:pointer;display:flex;align-items:center;gap:12px}
-    .pc-level-card b{font-family:'Fredoka';font-size:18px;display:block}.pc-level-card small{color:var(--muted);font-weight:700}
-    .pc-level-card .pc-badge{font-size:34px}
-    .pc-card{background:#fff;border:3px solid var(--line);border-radius:24px;padding:16px;margin-top:14px}
-    .pc-pt{position:relative;background:#EFFBEF;border:2px solid #B7E4BA;border-radius:16px;padding:12px 40px 12px 40px;font-weight:800;font-size:15px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-    .pc-check{position:absolute;left:10px;font-size:18px}
-    .pc-speak-btn{position:absolute;right:6px;background:#fff;width:34px;height:34px;padding:0;display:flex;align-items:center;justify-content:center}
-    .pc-en{font-family:'Fredoka';font-size:21px;text-align:center;margin-bottom:16px;line-height:1.4}
-    .pc-blank{display:inline-block;min-width:70px;border-bottom:4px dashed var(--sky);color:var(--sky);font-weight:700;text-align:center;padding:0 4px}
-    .pc-blank.filled{border-bottom-style:solid;border-color:var(--grass);color:#298b3a}
-    .pc-options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .pc-opt{border:3px solid var(--line);background:#fff;border-radius:18px;padding:14px;font-family:'Fredoka';font-size:17px;font-weight:700;cursor:pointer}
-    .pc-opt.correct{border-color:var(--grass);background:#EFFBEF}
-    .pc-opt.wrong{border-color:var(--coral);background:#FFF0EE;animation:shake .4s}
-    .pc-opt:disabled{cursor:not-allowed;opacity:.55}
-    .pc-feedback{min-height:26px;text-align:center;font-weight:800;margin-top:10px}
-    .pc-feedback.ok{color:#298b3a}.pc-feedback.bad{color:#C2483B}
-    .pc-result{text-align:center;padding-top:30px}.pc-result .big{font-size:70px}
-    `;
-    document.head.appendChild(css);
     bind();
   }
 
@@ -132,7 +172,7 @@
   };
 
   function renderLevels() {
-    $id('pcLevelGrid').innerHTML = LEVELS.map((l, i) => `<button class="pc-level-card" data-pc-level="${i}"><span class="pc-badge">${i === 0 ? '🌱' : '🚀'}</span><span><b>${l.name}</b><small>${l.desc} · ${l.sentences.length} frases</small></span></button>`).join('');
+    $id('pcLevelGrid').innerHTML = LEVELS.map((l, i) => `<button class="pc-level-card" data-pc-level="${i}"><span class="pc-badge">${l.icon}</span><span><b>${l.name}</b><small>${l.desc} · ${l.sentences.length} frases</small></span></button>`).join('');
     document.querySelectorAll('[data-pc-level]').forEach((b) => { b.onclick = () => startLevel(+b.dataset.pcLevel); });
   }
 

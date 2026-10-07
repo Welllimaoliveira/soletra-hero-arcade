@@ -17,7 +17,11 @@
   const settings = load();
 
   function save() { try { localStorage.setItem(KEY, JSON.stringify(settings)); } catch (e) {} }
-  function applyTheme() { document.documentElement.setAttribute('data-theme', settings.theme); }
+  // 'auto' segue o claro/escuro do celular; 'light'/'dark' são fixos.
+  const darkQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  function resolvedTheme(value) { return value === 'auto' ? (darkQuery && darkQuery.matches ? 'dark' : 'light') : value; }
+  function applyTheme() { document.documentElement.setAttribute('data-theme', resolvedTheme(settings.theme)); }
+  if (darkQuery && darkQuery.addEventListener) darkQuery.addEventListener('change', () => { if (settings.theme === 'auto') applyTheme(); });
 
   function get(key) { return settings[key]; }
   function set(key, value) {
@@ -32,6 +36,8 @@
   applyTheme();
 
   let panelEl = null;
+  let pendingTheme = settings.theme; // escolha ainda não aplicada (só vale depois de tocar em Aplicar)
+  const THEME_NAMES = { light: 'Claro', dark: 'Escuro', auto: 'Automático' };
 
   function renderPanel() {
     if (!panelEl) return;
@@ -39,10 +45,17 @@
     check('setSpeakAfter', settings.speakAfterCorrect);
     check('setHighlight', settings.highlightBeforeStart);
     check('setSounds', settings.buttonSounds);
-    const lightBtn = document.getElementById('setThemeLight');
-    const darkBtn = document.getElementById('setThemeDark');
-    if (lightBtn) lightBtn.classList.toggle('active', settings.theme === 'light');
-    if (darkBtn) darkBtn.classList.toggle('active', settings.theme === 'dark');
+    [['setThemeLight', 'light'], ['setThemeDark', 'dark'], ['setThemeAuto', 'auto']].forEach(([id, value]) => {
+      const btn = document.getElementById(id);
+      if (btn) btn.classList.toggle('active', pendingTheme === value);
+    });
+    const apply = document.getElementById('setThemeApply');
+    if (apply) apply.disabled = pendingTheme === settings.theme && document.documentElement.getAttribute('data-theme') === resolvedTheme(settings.theme);
+  }
+
+  function setStatus(text, ok) {
+    const el = document.getElementById('setThemeStatus');
+    if (el) { el.textContent = text; el.className = 'settings-status' + (ok ? ' ok' : ''); }
   }
 
   function ensureUI() {
@@ -64,19 +77,28 @@
       '<label class="settings-row"><span>🔊 Falar a palavra depois de acertar</span><input type="checkbox" id="setSpeakAfter"></label>' +
       '<label class="settings-row"><span>✨ Destacar as letras certas antes de começar</span><input type="checkbox" id="setHighlight"></label>' +
       '<label class="settings-row"><span>🔘 Som dos botões e do jogo</span><input type="checkbox" id="setSounds"></label>' +
-      '<div class="settings-row"><span>🌓 Tema</span><div class="settings-theme-toggle"><button id="setThemeLight" type="button" class="theme-btn">☀️ Claro</button><button id="setThemeDark" type="button" class="theme-btn">🌙 Escuro</button></div></div>' +
+      '<div class="settings-row"><span>🌓 Tema</span><div class="settings-theme-toggle"><button id="setThemeLight" type="button" class="theme-btn">☀️ Claro</button><button id="setThemeDark" type="button" class="theme-btn">🌙 Escuro</button><button id="setThemeAuto" type="button" class="theme-btn">🔄 Auto</button></div></div>' +
+      '<button id="setThemeApply" type="button" class="primary wide settings-apply">✅ Aplicar tema</button>' +
+      '<div id="setThemeStatus" class="settings-status" role="status"></div>' +
       '</div>';
     document.body.appendChild(panel);
     panelEl = panel;
 
-    gear.onclick = () => { panel.hidden = false; renderPanel(); };
+    gear.onclick = () => { pendingTheme = settings.theme; setStatus(''); panel.hidden = false; renderPanel(); };
     panel.addEventListener('click', (event) => { if (event.target === panel) panel.hidden = true; });
     document.getElementById('settingsCloseBtn').onclick = () => { panel.hidden = true; };
     document.getElementById('setSpeakAfter').onchange = (event) => set('speakAfterCorrect', event.target.checked);
     document.getElementById('setHighlight').onchange = (event) => set('highlightBeforeStart', event.target.checked);
     document.getElementById('setSounds').onchange = (event) => set('buttonSounds', event.target.checked);
-    document.getElementById('setThemeLight').onclick = () => set('theme', 'light');
-    document.getElementById('setThemeDark').onclick = () => set('theme', 'dark');
+    const pick = (value) => () => { pendingTheme = value; setStatus('Toque em Aplicar pra mudar o tema.'); renderPanel(); };
+    document.getElementById('setThemeLight').onclick = pick('light');
+    document.getElementById('setThemeDark').onclick = pick('dark');
+    document.getElementById('setThemeAuto').onclick = pick('auto');
+    document.getElementById('setThemeApply').onclick = () => {
+      set('theme', pendingTheme);
+      applyTheme(); // reaplica de novo por garantia (não depende do evento ter chegado)
+      setStatus('✅ Tema ' + THEME_NAMES[pendingTheme] + ' aplicado!', true);
+    };
     renderPanel();
   }
 
