@@ -99,7 +99,7 @@
     ]},
   ];
 
-  let state = { level: 0, round: [], index: 0, stars: 0, correct: 0, locked: false };
+  let state = { level: 0, round: [], index: 0, stars: 0, correct: 0, locked: false, solved: [], orders: [] };
 
   function speak(text) {
     try {
@@ -135,6 +135,7 @@
       <div id="pcOptions" class="pc-options"></div>
       <div id="pcFeedback" class="pc-feedback"></div>
     </div>
+    <div class="word-nav pc-nav"><button id="pcPrevBtn" class="secondary">← Frase anterior</button><span id="pcCounter" class="word-counter">Frase 1 de 10</span><button id="pcNextBtn" class="secondary">Próxima frase →</button></div>
   </div>
 
   <div id="pcResult" class="pc-result hidden">
@@ -159,6 +160,8 @@
     $id('pcBack').onclick = goHome;
     $id('pcPlayAgainBtn').onclick = () => startLevel(state.level);
     $id('pcHomeBtn').onclick = goHome;
+    $id('pcPrevBtn').onclick = () => { if (state.index > 0) { state.index--; loadSentence(); } };
+    $id('pcNextBtn').onclick = () => { if (state.solved[state.index]) { state.index++; loadSentence(); } };
     $id('pcSpeak').onclick = () => { const s = state.round[state.index]; if (s) speak(s.en.replace('___', s.answer)); };
   }
 
@@ -179,26 +182,38 @@
   function startLevel(levelIdx) {
     state.level = levelIdx;
     state.round = shuffle(LEVELS[levelIdx].sentences);
-    state.index = 0; state.stars = 0; state.correct = 0; state.locked = false;
+    state.index = 0; state.stars = 0; state.correct = 0; state.locked = false; state.solved = []; state.orders = [];
     $id('pcLevels').classList.add('hidden');
     $id('pcResult').classList.add('hidden');
     $id('pcPlay').classList.remove('hidden');
     loadSentence();
   }
 
+  function updateNav() {
+    const total = state.round.length, last = state.index >= total - 1;
+    $id('pcPrevBtn').disabled = state.index <= 0;
+    $id('pcNextBtn').disabled = !state.solved[state.index];
+    $id('pcNextBtn').textContent = last ? '🏁 Ver resultado' : 'Próxima frase →';
+    $id('pcCounter').textContent = `Frase ${state.index + 1} de ${total}`;
+  }
+
   function loadSentence() {
     if (state.index >= state.round.length) { finishLevel(); return; }
     const s = state.round[state.index];
-    state.locked = false;
+    const done = !!state.solved[state.index];
+    state.locked = done;
     $id('pcProgressFill').style.width = Math.round((state.index / state.round.length) * 100) + '%';
     $id('pcStarsPill').textContent = '⭐ ' + state.stars;
     $id('pcPtText').textContent = s.pt;
     const parts = s.en.split('___');
-    $id('pcEnText').innerHTML = `${esc(parts[0])}<span class="pc-blank" id="pcBlank">?</span>${esc(parts[1] || '')}`;
+    $id('pcEnText').innerHTML = `${esc(parts[0])}<span class="pc-blank${done ? ' filled' : ''}" id="pcBlank">${done ? esc(s.answer) : '?'}</span>${esc(parts[1] || '')}`;
     $id('pcFeedback').textContent = ''; $id('pcFeedback').className = 'pc-feedback';
-    $id('pcOptions').innerHTML = shuffle(s.options).map((o) => `<button class="pc-opt" data-pc-opt="${esc(o)}">${esc(o)}</button>`).join('');
+    if (!state.orders[state.index]) state.orders[state.index] = shuffle(s.options);
+    $id('pcOptions').innerHTML = state.orders[state.index].map((o) => `<button class="pc-opt${done && o === s.answer ? ' correct' : ''}" data-pc-opt="${esc(o)}"${done ? ' disabled' : ''}>${esc(o)}</button>`).join('');
+    if (done) { $id('pcFeedback').textContent = '✅ Isso aí! ' + s.pt.replace(/\.$/, '') + ' = "' + s.en.replace('___', s.answer) + '"'; $id('pcFeedback').className = 'pc-feedback ok'; }
     document.querySelectorAll('[data-pc-opt]').forEach((b) => { b.onclick = () => answer(b.dataset.pcOpt, b, s); });
-    setTimeout(() => speak(s.pt.length > s.en.length ? s.en.replace('___', '...') : s.en.replace('___', '...')), 300);
+    updateNav();
+    if (!done) setTimeout(() => speak(s.en.replace('___', '...')), 300);
   }
 
   function answer(chosen, btn, s) {
@@ -214,7 +229,8 @@
       $id('pcFeedback').textContent = '✅ Isso aí! ' + s.pt.replace(/\.$/, '') + ' = "' + s.en.replace('___', s.answer) + '"';
       $id('pcFeedback').className = 'pc-feedback ok';
       speak(s.en.replace('___', s.answer));
-      setTimeout(() => { state.index++; loadSentence(); }, 1600);
+      state.solved[state.index] = true;
+      updateNav();
     } else {
       btn.classList.add('wrong'); btn.disabled = true;
       setTimeout(() => btn.classList.remove('wrong'), 400);

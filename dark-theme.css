@@ -189,5 +189,6 @@
 :root[data-theme="dark"] .pc-opt,body.skin-night .pc-opt{background:#242028}
 :root[data-theme="dark"] .pc-opt.correct,body.skin-night .pc-opt.correct{background:#1e351e}
 :root[data-theme="dark"] .pc-opt.wrong,body.skin-night .pc-opt.wrong{background:#3b1b16}
+:root[data-theme="dark"] .pc-opt.correct:disabled,body.skin-night .pc-opt.correct:disabled{color:#9cdeab}
 :root[data-theme="dark"] .pc-feedback.ok,body.skin-night .pc-feedback.ok{color:#9cdda7}
 :root[data-theme="dark"] .pc-feedback.bad,body.skin-night .pc-feedback.bad{color:#dda39d}

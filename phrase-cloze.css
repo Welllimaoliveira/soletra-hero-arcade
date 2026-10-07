@@ -17,6 +17,8 @@
 .pc-opt.correct{border-color:var(--grass);background:#EFFBEF}
 .pc-opt.wrong{border-color:var(--coral);background:#FFF0EE;animation:shake .4s}
 .pc-opt:disabled{cursor:not-allowed;opacity:.55}
+.pc-opt.correct:disabled{opacity:1;color:#1f6b30}
+.pc-nav{margin-top:14px}
 .pc-feedback{min-height:26px;text-align:center;font-weight:800;margin-top:10px}
 .pc-feedback.ok{color:#298b3a}.pc-feedback.bad{color:#C2483B}
 .pc-result{text-align:center;padding-top:30px}.pc-result .big{font-size:70px}
