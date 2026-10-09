@@ -49,8 +49,6 @@
       const btn = document.getElementById(id);
       if (btn) btn.classList.toggle('active', pendingTheme === value);
     });
-    const apply = document.getElementById('setThemeApply');
-    if (apply) apply.disabled = pendingTheme === settings.theme && document.documentElement.getAttribute('data-theme') === resolvedTheme(settings.theme);
   }
 
   function setStatus(text, ok) {
@@ -78,7 +76,7 @@
       '<label class="settings-row"><span>✨ Destacar as letras certas antes de começar</span><input type="checkbox" id="setHighlight"></label>' +
       '<label class="settings-row"><span>🔘 Som dos botões e do jogo</span><input type="checkbox" id="setSounds"></label>' +
       '<div class="settings-row"><span>🌓 Tema</span><div class="settings-theme-toggle"><button id="setThemeLight" type="button" class="theme-btn">☀️ Claro</button><button id="setThemeDark" type="button" class="theme-btn">🌙 Escuro</button><button id="setThemeAuto" type="button" class="theme-btn">🔄 Auto</button></div></div>' +
-      '<button id="setThemeApply" type="button" class="primary wide settings-apply">✅ Aplicar tema</button>' +
+      '<button id="setThemeApply" type="button" class="primary wide settings-apply">✅ Aplicar</button>' +
       '<div id="setThemeStatus" class="settings-status" role="status"></div>' +
       '</div>';
     document.body.appendChild(panel);
@@ -100,10 +98,17 @@
     document.getElementById('setThemeLight').onclick = pick('light');
     document.getElementById('setThemeDark').onclick = pick('dark');
     document.getElementById('setThemeAuto').onclick = pick('auto');
+    // "Aplicar" confirma tudo de uma vez: o tema escolhido + as 3 opções (que
+    // já valem na hora quando marcadas/desmarcadas, mas aqui são regravadas
+    // de novo por garantia) e fecha o painel.
     document.getElementById('setThemeApply').onclick = () => {
+      set('speakAfterCorrect', document.getElementById('setSpeakAfter').checked);
+      set('highlightBeforeStart', document.getElementById('setHighlight').checked);
+      set('buttonSounds', document.getElementById('setSounds').checked);
       set('theme', pendingTheme);
       applyTheme(); // reaplica de novo por garantia (não depende do evento ter chegado)
-      setStatus('✅ Tema ' + THEME_NAMES[pendingTheme] + ' aplicado!', true);
+      setStatus('✅ Configurações aplicadas! Tema ' + THEME_NAMES[pendingTheme] + '.', true);
+      setTimeout(() => { panel.hidden = true; }, 900);
     };
     renderPanel();
   }
