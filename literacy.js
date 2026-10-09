@@ -49,7 +49,7 @@
     profissoes:[
       ['A','_DVOGADO','ADVOGADO',0],['E','_NFERMEIRO','ENFERMEIRO',0],['A','_STRONAUTA','ASTRONAUTA',0],
       ['O','_PERÁRIO','OPERÁRIO',0],['A','_TLETA','ATLETA',0],
-      ['JU','_IZ','JUIZ',1],['ME','_DICO','MÉDICO',1],['BA','_RBEIRO','BARBEIRO',1],['BO','_MBEIRO','BOMBEIRO',1],
+      ['JU','_IZ','JUIZ',1],['MÉ','_DICO','MÉDICO',1],['BA','_RBEIRO','BARBEIRO',1],['BO','_MBEIRO','BOMBEIRO',1],
       ['MA','_RINHEIRO','MARINHEIRO',1],['JA','_RDINEIRO','JARDINEIRO',1],
       ['NHE','COZI_IRO','COZINHEIRO',2],['CHE','_FE','CHEFE',2],
       ['PRO','_FESSOR','PROFESSOR',3],['PRI','_NCESA','PRINCESA',3],['TRA','_BALHADOR','TRABALHADOR',3],['PRO','_GRAMADOR','PROGRAMADOR',3],
@@ -95,7 +95,7 @@
   // sílabas simples e dígrafos, então todas essas palavras continuam valendo
   // - é isso que faz o total de palavras crescer nos níveis mais difíceis,
   // em vez de ficar preso às 5 sílabas praticadas no round de som.
-  function availableWords(){return WORDS[state.theme].filter(w=>w[3]<=state.level)}
+  function availableWords(){const seen=new Set();return WORDS[state.theme].filter(w=>w[3]<=state.level&&!seen.has(w[2])&&seen.add(w[2]))}
 
   function historyKey(){return `soletra-literacy-history:${state.theme}:${state.level}`}
   function loadHistory(){try{const raw=JSON.parse(localStorage.getItem(historyKey())||'[]');return Array.isArray(raw)?raw:[]}catch(_){return []}}
@@ -117,8 +117,8 @@
     if(!state.words.length){feedback('Sons concluídos! Esta família ainda não possui palavra no tema escolhido.',true);setTimeout(finish,700);return}
     renderWord();
   }
-  function renderWord(){const w=state.words[state.word];if(!w){finish();return}$id('fillWord').textContent=w[1];const choices=shuffled([...new Set([w[0],...currentSyllables()])]).slice(0,5);$id('wordChoices').innerHTML=choices.map(s=>`<button class="syllable-token" data-word-answer="${s}">${s}</button>`).join('');document.querySelectorAll('[data-word-answer]').forEach(b=>b.onclick=()=>answerWord(b,w));speak(w[2]);setTimeout(()=>{const btn=[...document.querySelectorAll('[data-word-answer]')].find(b=>b.dataset.wordAnswer===w[0]);if(btn){btn.classList.add('intro-flash');setTimeout(()=>btn.classList.remove('intro-flash'),900)}},700)}
-  function answerWord(btn,w){state.answers++;if(btn.dataset.wordAnswer===w[0]){btn.classList.add('correct');feedback(`${w[2]}! Você acertou. 🌟`,true);speak(w[2]);state.word++;setTimeout(renderWord,850)}else{state.errors++;btn.classList.add('wrong');feedback('Tente outra sílaba.',false);setTimeout(()=>btn.classList.remove('wrong'),500)}}
+  function renderWord(){const w=state.words[state.word];if(!w){finish();return}$id('fillWord').textContent=w[1];const wrongs=shuffled(currentSyllables().filter(s=>s!==w[0])).slice(0,4);const choices=shuffled([w[0],...wrongs]);$id('wordChoices').innerHTML=choices.map(s=>`<button class="syllable-token" data-word-answer="${s}">${s}</button>`).join('');document.querySelectorAll('[data-word-answer]').forEach(b=>b.onclick=()=>answerWord(b,w));speak(w[2]);setTimeout(()=>{const btn=[...document.querySelectorAll('[data-word-answer]')].find(b=>b.dataset.wordAnswer===w[0]);if(btn){btn.classList.add('intro-flash');setTimeout(()=>btn.classList.remove('intro-flash'),900)}},700)}
+  function answerWord(btn,w){state.answers++;if(btn.dataset.wordAnswer===w[0]){btn.classList.add('correct');feedback(`${w[2]}! Você acertou. 🌟`,true);if(typeof AppSettings==='undefined'||AppSettings.get('speakAfterCorrect')!==false)speak(w[2]);state.word++;setTimeout(renderWord,850)}else{state.errors++;btn.classList.add('wrong');feedback('Tente outra sílaba.',false);setTimeout(()=>btn.classList.remove('wrong'),500)}}
   async function finish(){const score=Math.max(10,state.answers*10-state.errors*3),accuracy=Math.round((state.answers-state.errors)/Math.max(1,state.answers)*100);feedback(`Trilha concluída: ${score} pontos · ${accuracy}% de precisão! 🏆`,true);if(state.words&&state.words.length)pushHistory(state.words.map(w=>w[2]));$id('wordPhase').innerHTML=`<div class="fill-word">🏆</div><h3 style="text-align:center">Trilha concluída!</h3><p style="text-align:center">${score} pontos · ${accuracy}% de precisão</p><button id="learningAgain" class="primary wide">Próxima trilha</button>`;$id('learningAgain').onclick=()=>{state.set++;renderSetup()};await saveProgress(score,accuracy)}
   async function saveProgress(score,accuracy){const api=window.AuthSession;if(!api?.user)return;try{await api.supabase.from('learning_attempts').insert({account_id:api.user.id,child_id:state.childId||null,module:'literacy',subject:`${LEVELS[state.level].id}:${state.theme}`,score,accuracy,errors:state.errors,duration_seconds:Math.round((Date.now()-state.started)/1000)});}catch(e){console.warn('Progresso pendente',e)}}
   async function openFamily(){$id('familyModal').classList.remove('hidden');await renderFamily()}

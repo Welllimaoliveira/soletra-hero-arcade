@@ -87,9 +87,15 @@
     gear.onclick = () => { pendingTheme = settings.theme; setStatus(''); panel.hidden = false; renderPanel(); };
     panel.addEventListener('click', (event) => { if (event.target === panel) panel.hidden = true; });
     document.getElementById('settingsCloseBtn').onclick = () => { panel.hidden = true; };
-    document.getElementById('setSpeakAfter').onchange = (event) => set('speakAfterCorrect', event.target.checked);
-    document.getElementById('setHighlight').onchange = (event) => set('highlightBeforeStart', event.target.checked);
-    document.getElementById('setSounds').onchange = (event) => set('buttonSounds', event.target.checked);
+    // Os interruptores valem na hora (sem precisar de "Aplicar" - só o tema usa
+    // o botão), então mostramos "Salvo" pra deixar claro que pegou.
+    const toggle = (key, label) => (event) => {
+      set(key, event.target.checked);
+      setStatus('✅ ' + label + ': ' + (event.target.checked ? 'ligado' : 'desligado') + ' (salvo)', true);
+    };
+    document.getElementById('setSpeakAfter').onchange = toggle('speakAfterCorrect', 'Falar a palavra');
+    document.getElementById('setHighlight').onchange = toggle('highlightBeforeStart', 'Destacar letras');
+    document.getElementById('setSounds').onchange = toggle('buttonSounds', 'Som dos botões');
     const pick = (value) => () => { pendingTheme = value; setStatus('Toque em Aplicar pra mudar o tema.'); renderPanel(); };
     document.getElementById('setThemeLight').onclick = pick('light');
     document.getElementById('setThemeDark').onclick = pick('dark');

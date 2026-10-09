@@ -1,4 +1,4 @@
-const CACHE='soletra-hero-arcade-v6-5-literacy-fix';
+const CACHE='soletra-hero-arcade-v6-6-botoes-auditados';
 const CORE=['./','./index.html','./manifest.webmanifest','./auth.css','./auth.js','./literacy.css','./literacy.js'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));

@@ -228,7 +228,7 @@
       $id('pcStarsPill').textContent = '⭐ ' + state.stars;
       $id('pcFeedback').textContent = '✅ Isso aí! ' + s.pt.replace(/\.$/, '') + ' = "' + s.en.replace('___', s.answer) + '"';
       $id('pcFeedback').className = 'pc-feedback ok';
-      speak(s.en.replace('___', s.answer));
+      if (typeof AppSettings === 'undefined' || AppSettings.get('speakAfterCorrect') !== false) speak(s.en.replace('___', s.answer));
       state.solved[state.index] = true;
       updateNav();
     } else {
